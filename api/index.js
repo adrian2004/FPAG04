@@ -18,7 +18,20 @@ const users = [
     { id: 1, email: 'admin@interfocus.com.br', password: 'admin' }
 ];
 
+const authenticateToken = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+        return res.sendStatus(403); // Proibido
+    }
 
+    jwt.verify(token, secretKey, (err, user) => {
+        if (err) {
+            return res.sendStatus(403);
+        }
+        req.user = user; // Anexa o usuário ao request
+        next();
+    });
+};
 
 app.post('/login', (req, res) => {
     const { email, password } = req.body;
@@ -39,6 +52,10 @@ app.post('/login', (req, res) => {
     } else {
         res.status(401).json({ message: 'Usuário ou senha inválidos' });
     }
+});
+
+app.get('/home', authenticateToken, (req, res) => {
+    res.json({ message: `Bem-vindo, ${req.user.email}!` });
 });
 
 app.listen(port, () => {
