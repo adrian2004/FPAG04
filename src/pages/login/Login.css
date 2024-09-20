@@ -1,0 +1,8 @@
+.login-page {
+    height: 100%;
+}
+
+.login-page3-inner .login-page3-banner {
+    width: 340px;
+    background-image: url(/public/logo_interfocus.jpg);
+}
