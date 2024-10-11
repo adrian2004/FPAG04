@@ -1,11 +1,27 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
+const pg = require('pg');
 
 const app = express();
 const port = 5000;
 const secretKey = 'seuSegredoSuperSeguro'; // Mantenha isso seguro
+
+const { Client } = pg;
+const client = new Client({
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    host: process.env.DB_HOST,
+    port: '5432',
+    database: 'fpa',
+});
+
+client.connect()
+    .then(() => {
+        console.log('Conectado ao banco de dados!');
+    });
 
 app.use(cors({
     origin: 'http://localhost:3000',

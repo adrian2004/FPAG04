@@ -1,15 +1,15 @@
 import React, {useState} from 'react';
-import './Login.css';
 import {useNavigate} from 'react-router-dom';
-//import logo_interfocus from '../../../public/logo_interfocus.jpg'
 
 const LoginPage = () => {
-    const [email, setEmail] = useState();
-    const [password, setPassword] = useState();
-    const [error, setError] = useState();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
+    const handleLogin = async (e) => {
+        e.preventDefault()
+        
         try {
             const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
@@ -31,9 +31,9 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="container-login">
-            <img className="img-logo max-w-lg" src="/logo_interfocus.jpg" alt=""/>
-            <div className="max-w-lg w-full login-box">
+        <div className="flex justify-center h-screen w-screen">
+            <img className="h-10 absolute" src="/logo_interfocus.jpg" alt=""/>
+            <div className="max-w-lg w-full content-center">
                 <div
                     className="bg-gray-800 rounded-lg shadow-xl overflow-hidden"
                 >
@@ -42,18 +42,18 @@ const LoginPage = () => {
                             Bem-vindo de volta!
                         </h2>
                         <p className="mt-4 text-center text-gray-400">Entre para continuar</p>
-                        <form method="POST" action="#" className="mt-8 space-y-6">
+                        <form onSubmit={handleLogin} className="mt-8 space-y-6">
                             <div className="rounded-md shadow-sm">
                                 <div>
                                     <label className="sr-only" htmlFor="email">E-mail</label>
                                     <input
                                         placeholder="E-mail"
                                         className="appearance-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        required=""
+                                        required
                                         autoComplete="email"
                                         type="email"
-                                        name="email"
-                                        id="email"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
                                     />
                                 </div>
                                 <div className="mt-4">
@@ -61,11 +61,11 @@ const LoginPage = () => {
                                     <input
                                         placeholder="Senha"
                                         className="appearance-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        required=""
+                                        required
                                         autoComplete="current-password"
                                         type="password"
-                                        name="password"
-                                        id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
                                     />
                                 </div>
                             </div>
