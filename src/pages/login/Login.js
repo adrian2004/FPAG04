@@ -1,15 +1,19 @@
-import React, {useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [inputValue, setInputValue] = useState('')
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault()
-        
+
         try {
             const response = await fetch('http://localhost:5000/login', {
                 method: 'POST',
@@ -17,26 +21,34 @@ const LoginPage = () => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({email, password})
+                body: JSON.stringify({ email, password })
             });
 
             if (response.ok) {
                 navigate('/');
             } else {
-                setError('Usuário ou senha inválidos');
+                const showSwal = () => {
+                    withReactContent(Swal).fire({
+                        title: "Este usuário está logado em outro dispositivo!",
+                        icon: "warning",
+                        confirmButtonText: '<i class="transition duration-200 ease-in-out"></i> Desejo continuar!',
+                        reverseButtons: true
+                    })
+                  }
+                  showSwal()
+                //setError('Usuário ou senha inválidos');
             }
         } catch (error) {
+            console.log(error);
+            
             setError('Ocorreu um erro ao tentar fazer login');
         }
     };
 
     return (
-        <div className="flex justify-center h-screen w-screen">
-            <img className="h-10 absolute" src="/logo_interfocus.jpg" alt=""/>
+        <div className="flex justify-center h-screen w-screen bg-cover bg-center" style={{ backgroundImage: "url(/images/bckg.jpg)" }}>
             <div className="max-w-lg w-full content-center">
-                <div
-                    className="bg-gray-800 rounded-lg shadow-xl overflow-hidden"
-                >
+                <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden" >
                     <div className="p-8">
                         <h2 className="text-center text-3xl font-extrabold text-white">
                             Bem-vindo de volta!
@@ -73,19 +85,19 @@ const LoginPage = () => {
                             <div className="flex items-center justify-between mt-4">
                                 <div className="flex items-center">
                                     <input
-                                        className="h-4 w-4 text-indigo-500 focus:ring-indigo-400 border-gray-600 rounded"
+                                        className="h-4 w-4 text-blue-700 focus:ring-indigo-400 border-gray-600 rounded"
                                         type="checkbox"
                                         name="remember-me"
                                         id="remember-me"
                                     />
-                                    <label className="ml-2 block text-sm text-gray-400" htmlFor="remember-me"
+                                    <label className="ml-2 block text-sm text-white" htmlFor="remember-me"
                                     >Lembre-me</label
                                     >
                                 </div>
 
                                 <div className="text-sm">
                                     <a
-                                        className="font-medium text-indigo-500 hover:text-indigo-400"
+                                        className="font-medium text-white hover:text-[#057cac] transition duration-200 ease-in-out"
                                         href="#"
                                     >
                                         Esqueceu a senha?
@@ -95,7 +107,7 @@ const LoginPage = () => {
 
                             <div>
                                 <button
-                                    className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-gray-900 bg-indigo-500 hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                                    className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white transition duration-200 ease-in-out bg-[#057cac] hover:bg-[#0464a4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                     type="submit"
                                 >
                                     Entrar
@@ -105,7 +117,7 @@ const LoginPage = () => {
                     </div>
                     <div className="px-8 py-4 bg-gray-700 text-center">
                         <span className="text-gray-400">Não possuí uma conta?</span>
-                        <a className="font-medium text-indigo-500 hover:text-indigo-400" href="#"
+                        <a className="font-medium text-white hover:text-[#057cac] transition duration-200 ease-in-out" href="#"
                         > Cadastre-se</a
                         >
                     </div>
