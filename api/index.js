@@ -4,10 +4,11 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const pg = require('pg');
+const security = require('./lib/security');
 
 const app = express();
 const port = 5000;
-const secretKey = 'seuSegredoSuperSeguro'; // Mantenha isso seguro
+const secretKey = 'rootroot';
 
 const { Client } = pg;
 const client = new Client({
@@ -15,7 +16,7 @@ const client = new Client({
     password: process.env.DB_PASSWORD,
     host: process.env.DB_HOST,
     port: '5432',
-    database: 'fpa',
+    database: 'postgres',
 });
 
 client.connect()
@@ -25,43 +26,46 @@ client.connect()
 
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials: true // Permite cookies nas requisições cross-origin
+    credentials: true // Permite cookies nas requisições cross-origin, REMOVER EM PROD!!!
 }));
 app.use(express.json());
 app.use(cookieParser());
 
-const users = [
-    { id: 1, email: 'admin@interfocus.com.br', password: 'admin' }
-];
-
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
     if (!token) {
-        return res.sendStatus(403); // Proibido
+        return res.sendStatus(403);
     }
 
     jwt.verify(token, secretKey, (err, user) => {
         if (err) {
             return res.sendStatus(403);
         }
-        req.user = user; // Anexa o usuário ao request
+        req.user = user;
         next();
     });
 };
 
-app.post('/login', (req, res) => {
+app.post('/login', async (req, res) => {
     const { email, password } = req.body;
-    const user = users.find(user => user.email === email && user.password === password);
 
-    if (user) {
-        // Gerar o token JWT
-        const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: '1h' });
+    const user_list = await client.query('SELECT * FROM usuario WHERE email = $1;', [email])
 
-        // Setar o token como um cookie
+    if (user_list.rowCount == 0){
+        return res.status(401).json({ message: 'Usuário ou senha inválidos' });
+    }
+    
+    if ( !security.checkHash(password, user_list.rows[0].hash) ){
+        return res.status(401).json({ message: 'Usuário ou senha inválidos' });
+    }
+
+    if (user_list) {
+        const token = jwt.sign({ id: user_list.user_list, email: user_list.email }, secretKey, { expiresIn: '1h' });
+
         res.cookie('token', token, {
-            httpOnly: true, // Para maior segurança, impede o acesso via JavaScript
-            secure: false,  // Defina como `true` se usar HTTPS
-            sameSite: 'Strict' // Controla o uso do cookie entre sites
+            httpOnly: true,
+            secure: false,
+            sameSite: 'Strict'
         });
 
         res.json({ message: 'Login realizado com sucesso!' });
@@ -73,6 +77,12 @@ app.post('/login', (req, res) => {
 app.get('/home', authenticateToken, (req, res) => {
     res.json({ message: `Bem-vindo, ${req.user.email}!` });
 });
+
+app.get('/logout', (req, res) => {
+    res.clearCookie("token");
+    res.status(302).redirect('http://localhost:3000/login');
+});
+
 
 app.listen(port, () => {
     console.log(`API rodando em http://localhost:${port}`);

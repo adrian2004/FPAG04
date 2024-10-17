@@ -29,9 +29,9 @@ const LoginPage = () => {
             } else {
                 const showSwal = () => {
                     withReactContent(Swal).fire({
-                        title: "Este usuário está logado em outro dispositivo!",
+                        title: "Senha incorreta. Tente novamente!",
                         icon: "warning",
-                        confirmButtonText: '<i class="transition duration-200 ease-in-out"></i> Desejo continuar!',
+                        confirmButtonText: '<i class="transition duration-200 ease-in-out"></i> Confirmar',
                         reverseButtons: true
                     })
                   }

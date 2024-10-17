@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 
-async function generateHash(inputString) {
+exports.generateHash = async function (inputString) {
     try {
         const salt = await bcrypt.genSalt(10);
         return await bcrypt.hash(inputString, salt);
@@ -9,14 +9,6 @@ async function generateHash(inputString) {
     };
 };
 
-async function checkHash(inputString, hash) {
+exports.checkHash = async function (inputString, hash) {
     return await bcrypt.compare(inputString, hash);
 };
-
-;(async () => {
-    let hash = await generateHash('admin')
-
-    console.log(await checkHash('admin', hash))
-
-})();
-
