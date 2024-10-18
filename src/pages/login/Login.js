@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
 
-
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -27,20 +26,26 @@ const LoginPage = () => {
             if (response.ok) {
                 navigate('/');
             } else {
+                let responseJson = await response.json();
+                document.querySelector('div[role="alert"]').classList.remove('hidden');
+                document.querySelector('div[role="alert"]').classList.add('flex');
+
+                setError(responseJson.message);
+                /* 
                 const showSwal = () => {
                     withReactContent(Swal).fire({
-                        title: "Senha incorreta. Tente novamente!",
+                        title: responseJson.message,
                         icon: "warning",
                         confirmButtonText: '<i class="transition duration-200 ease-in-out"></i> Confirmar',
                         reverseButtons: true
                     })
-                  }
-                  showSwal()
+                }
+                showSwal() */
                 //setError('Usuário ou senha inválidos');
             }
         } catch (error) {
             console.log(error);
-            
+
             setError('Ocorreu um erro ao tentar fazer login');
         }
     };
@@ -48,6 +53,29 @@ const LoginPage = () => {
     return (
         <div className="flex justify-center h-screen w-screen bg-cover bg-center" style={{ backgroundImage: "url(/images/bckg.jpg)" }}>
             <div className="max-w-lg w-full content-center">
+                <div class="space-y-2 p-4">
+                    <div
+                        role="alert"
+                        class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-700 text-red-900 dark:text-red-100 
+                p-2 rounded-lg hidden items-center transition duration-300 ease-in-out hover:bg-red-200 dark:hover:bg-red-800 transform hover:scale-105"
+                    >
+                        <svg
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            class="h-5 w-5 flex-shrink-0 mr-2 text-red-600"
+                            xmlns="http://www.w3.org/2000/svg"
+                        >
+                            <path
+                                d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                stroke-width="2"
+                                stroke-linejoin="round"
+                                stroke-linecap="round"
+                            ></path>
+                        </svg>
+                        <p class="text-xs font-semibold">{error}</p>
+                    </div>
+                </div>
                 <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden" >
                     <div className="p-8">
                         <h2 className="text-center text-3xl font-extrabold text-white">
@@ -122,6 +150,7 @@ const LoginPage = () => {
                         >
                     </div>
                 </div>
+
             </div>
         </div>
     );

@@ -53,14 +53,25 @@ app.post('/login', async (req, res) => {
 
     if (user_list.rowCount == 0){
         return res.status(401).json({ message: 'Usuário ou senha inválidos' });
-    }
-    
-    if ( !security.checkHash(password, user_list.rows[0].hash) ){
+    }    
+
+    if (!await security.checkHash(password, user_list.rows[0].hash)){
         return res.status(401).json({ message: 'Usuário ou senha inválidos' });
     }
 
+    const active_sessions = await client.query('SELECT * FROM sessions WHERE id_usuario = $1;', [user_list.rows[0].id_usuario])
+
+    if (active_sessions.rows[0].active) {
+        res.status(403).json({ message: 'Usuário já logado!' });
+    }
+    res.status(200).send()
+
+    return
+
+
     if (user_list) {
         const token = jwt.sign({ id: user_list.user_list, email: user_list.email }, secretKey, { expiresIn: '1h' });
+        await client.query('INSERT INTO sessions(id_usuario, active) VALUES($1, true);', [user_list.rows[0].id_usuario])
 
         res.cookie('token', token, {
             httpOnly: true,
