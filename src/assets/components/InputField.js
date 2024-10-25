@@ -2,7 +2,7 @@
 import React from "react";
 
 function InputField(props) {
-  const { label, id, extra, type, placeholder, variant, state, disabled } =
+  const { label, id, extra, type, placeholder, variant, state, disabled, onChange } =
     props;
 
   return (
@@ -29,6 +29,8 @@ function InputField(props) {
             ? "border-green-500 text-green-500 placeholder:text-green-500"
             : "border-gray-200"
         }`}
+        onChange={onChange}
+
       />
     </div>
   );

@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import InputField from "../../assets/components/InputField";
+import { FcGoogle } from "react-icons/fc";
+import Checkbox from '../../assets/components/Checkbox';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import '../../assets/css/index.css';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-    const [inputValue, setInputValue] = useState('')
     const navigate = useNavigate();
 
     const handleLogin = async (e) => {
@@ -19,7 +22,6 @@ const LoginPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                credentials: 'include',
                 body: JSON.stringify({ email, password })
             });
 
@@ -27,21 +29,38 @@ const LoginPage = () => {
                 navigate('/');
             } else {
                 let responseJson = await response.json();
-                document.querySelector('div[role="alert"]').classList.remove('hidden');
-                document.querySelector('div[role="alert"]').classList.add('flex');
-
-                setError(responseJson.message);
-                /* 
-                const showSwal = () => {
-                    withReactContent(Swal).fire({
-                        title: responseJson.message,
-                        icon: "warning",
-                        confirmButtonText: '<i class="transition duration-200 ease-in-out"></i> Confirmar',
-                        reverseButtons: true
-                    })
+                if (responseJson.status == 'logged') {
+                    const showSwal = () => {
+                        withReactContent(Swal).fire({
+                            title: 'Usuário já logado, deseja substituir a sessão?',
+                            icon: 'warning',
+                            confirmButtonText: 'Confirmar',
+                            reverseButtons: true,
+                            showCancelButton: true,
+                            cancelButtonText: 'Cancelar',
+                            preConfirm: async () => {
+                                try {
+                                    let req = await fetch('http://localhost:5000/login', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ email, password, token: responseJson.token })
+                                    });
+                                } catch (error) {
+                                    console.log('NOTOK');
+                                }
+                            },
+                        })
+                    }
+                    showSwal()
                 }
-                showSwal() */
-                //setError('Usuário ou senha inválidos');
+                else {
+                    document.querySelector('div[role="alert"]').classList.remove('hidden');
+                    document.querySelector('div[role="alert"]').classList.add('flex');
+
+                    setError(responseJson.message);
+                }
             }
         } catch (error) {
             console.log(error);
@@ -51,106 +70,81 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex justify-center h-screen w-screen bg-cover bg-center" style={{ backgroundImage: "url(/images/bckg.jpg)" }}>
-            <div className="max-w-lg w-full content-center">
-                <div class="space-y-2 p-4">
+        <div className="flex h-screen w-full items-center justify-between px-4">
+            <div className="w-full max-w-md bg-white p-8 rounded-lg mr-auto lg:ml-60">
+                <h4 className="mb-4 text-4xl font-bold text-[#2d2d2d] text-left">
+                    Entrar
+                </h4>
+                <p className="mb-6 text-left text-[#b1b1b1]">
+                    Digite seu e-mail e senha para entrar!
+                </p>
+                <div className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-lightPrimary bg-[#f4f7fe] hover:cursor-pointer py-3">
+                    <FcGoogle className="text-xl" />
+                    <h5 className="text-sm p-1 font-medium text-navy-700">
+                        Entrar com o Google
+                    </h5>
+                </div>
+                <div className="mb-1 flex items-center justify-between">
+                    <div className="h-px w-full bg-gray-200" />
+                    <p className="px-3 text-sm text-gray-600">ou</p>
+                    <div className="h-px w-full bg-gray-200" />
+                </div>
+                {error && (
                     <div
+                        className="mt-1 p-2 text-sm text-red-500 bg-red-100 rounded-md"
                         role="alert"
-                        class="bg-red-100 dark:bg-red-900 border-l-4 border-red-500 dark:border-red-700 text-red-900 dark:text-red-100 
-                p-2 rounded-lg hidden items-center transition duration-300 ease-in-out hover:bg-red-200 dark:hover:bg-red-800 transform hover:scale-105"
                     >
-                        <svg
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            class="h-5 w-5 flex-shrink-0 mr-2 text-red-600"
-                            xmlns="http://www.w3.org/2000/svg"
+                        {error}
+                    </div>
+                )}
+                <form onSubmit={handleLogin} className="space-y-4">
+                    <InputField
+                        variant="auth"
+                        extra="mb-3"
+                        label="Email"
+                        placeholder="admin@interfocus.com.br"
+                        id="email"
+                        type="text"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+
+                    <InputField
+                        variant="auth"
+                        extra="mb-3"
+                        label="Senha"
+                        placeholder="Senha"
+                        id="password"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
+
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center">
+                            <Checkbox />
+                            <p className="ml-2 text-sm font-medium text-navy-700">
+                                Lembre-me
+                            </p>
+                        </div>
+                        <a
+                            href="#"
+                            className="text-sm font-medium text-brand-500 hover:text-brand-600 hover:text-[#0c53a2] transition duration-200"
                         >
-                            <path
-                                d="M13 16h-1v-4h1m0-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                                stroke-width="2"
-                                stroke-linejoin="round"
-                                stroke-linecap="round"
-                            ></path>
-                        </svg>
-                        <p class="text-xs font-semibold">{error}</p>
+                            Esqueceu a senha?
+                        </a>
                     </div>
-                </div>
-                <div className="bg-gray-800 rounded-lg shadow-xl overflow-hidden" >
-                    <div className="p-8">
-                        <h2 className="text-center text-3xl font-extrabold text-white">
-                            Bem-vindo de volta!
-                        </h2>
-                        <p className="mt-4 text-center text-gray-400">Entre para continuar</p>
-                        <form onSubmit={handleLogin} className="mt-8 space-y-6">
-                            <div className="rounded-md shadow-sm">
-                                <div>
-                                    <label className="sr-only" htmlFor="email">E-mail</label>
-                                    <input
-                                        placeholder="E-mail"
-                                        className="appearance-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        required
-                                        autoComplete="email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div className="mt-4">
-                                    <label className="sr-only" htmlFor="password">Senha</label>
-                                    <input
-                                        placeholder="Senha"
-                                        className="appearance-none relative block w-full px-3 py-3 border border-gray-700 bg-gray-700 text-white rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                                        required
-                                        autoComplete="current-password"
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                            </div>
 
-                            <div className="flex items-center justify-between mt-4">
-                                <div className="flex items-center">
-                                    <input
-                                        className="h-4 w-4 text-blue-700 focus:ring-indigo-400 border-gray-600 rounded"
-                                        type="checkbox"
-                                        name="remember-me"
-                                        id="remember-me"
-                                    />
-                                    <label className="ml-2 block text-sm text-white" htmlFor="remember-me"
-                                    >Lembre-me</label
-                                    >
-                                </div>
+                    <button className="linear mt-2 w-full rounded-xl bg-brand-500 py-[12px] text-base bg-[#0c53a2] font-medium text-white transition duration-200 hover:bg-brand-600 active:bg-brand-700">
+                    Sign In
+                </button>
+                </form>
+            </div>
 
-                                <div className="text-sm">
-                                    <a
-                                        className="font-medium text-white hover:text-[#057cac] transition duration-200 ease-in-out"
-                                        href="#"
-                                    >
-                                        Esqueceu a senha?
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div>
-                                <button
-                                    className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white transition duration-200 ease-in-out bg-[#057cac] hover:bg-[#0464a4] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                                    type="submit"
-                                >
-                                    Entrar
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="px-8 py-4 bg-gray-700 text-center">
-                        <span className="text-gray-400">Não possuí uma conta?</span>
-                        <a className="font-medium text-white hover:text-[#057cac] transition duration-200 ease-in-out" href="#"
-                        > Cadastre-se</a
-                        >
-                    </div>
-                </div>
-
+            <div className="absolute right-0 h-full min-h-screen w-full md:w-[50%] lg:w-[49vw] 2xl:w-[44vw]">
+                <div
+                    className="bg-image flex h-full w-full items-end justify-center bg-cover bg-center lg:rounded-bl-[120px] xl:rounded-bl-[200px]"
+                />
             </div>
         </div>
     );
