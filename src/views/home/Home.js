@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import dashboardIcon from '../../assets/img/home/dashboard-icon.png';
+import homeIcon from '../../assets/img/home/home.png';
+import logoutIcon from '../../assets/img/home/logout.png';
 
 const HomePage = () => {
     const [message, setMessage] = useState('');
@@ -34,19 +37,19 @@ const HomePage = () => {
                 <button
                     class="text-red-500 hover:text-red-600 mx-2 transition-transform duration-200 ease-in-out hover:scale-110 focus:outline-none focus:ring-2 focus:ring-red-500 rounded-full"
                 >
-                    <img src="/images/dashboard-icon.png" alt="Dashboard Icon" class="h-6 w-6" />
+                    <img src={dashboardIcon} alt="Dashboard Icon" class="h-6 w-6" />
 
                 </button>
                 <button
                     class="text-gray-600 hover:text-gray-800 mx-2 transition-all duration-200 ease-in-out hover:rotate-12 focus:outline-none focus:ring-2 focus:ring-gray-500 rounded-full"
                 >
-                    <img src="/images/home.png" alt="Home Icon" class="h-6 w-6" />
+                    <img src={homeIcon} alt="Home Icon" class="h-6 w-6" />
                 </button>
                 
                 <a
                     href='/logout' class="text-gray-600 hover:text-gray-800 mx-2 transition-all duration-200 ease-in-out focus:outline-none hover:scale-110 focus:ring-2 focus:ring-gray-500 rounded-full"
                 >
-                    <img src="/images/logout.png" alt="Dashboard Icon" class="h-6 w-6" />
+                    <img src={logoutIcon} alt="Dashboard Icon" class="h-6 w-6" />
                 </a>
             </div>
         </div>

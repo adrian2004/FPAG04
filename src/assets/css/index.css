@@ -15,7 +15,7 @@
 }
 
 input.defaultCheckbox::before {
-	content: url(../../../public/images/check.svg);
+	content: url(../../assets/svg/check.svg);
 	color: white;
 	opacity: 0;
 	height: 20px;
@@ -30,5 +30,5 @@ input:checked.defaultCheckbox::before {
 }
 
 .bg-image {
-    background-image: url(../../assets/img/bg.png);
+    background-image: url(../../assets/img/background/bg.png);
 }

@@ -1,9 +1,10 @@
 import React from 'react';
+
 import { Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/login/Login';
-import HomePage from './pages/home/Home';
-import Logout from './pages/logout/Logout'
-import LoginPage2 from './pages/login/login2';
+import LoginPage from './views/login/Login';
+import HomePage from './views/home/Home';
+import Logout from './views/logout/Logout'
+import LoginPage2 from './views/login/Login2';
 
 const App = () => {
     return (
