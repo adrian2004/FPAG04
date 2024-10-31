@@ -26,7 +26,9 @@ client.connect()
 
 app.use(cors({
     origin: 'http://localhost:3000',
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -56,7 +58,6 @@ app.post('/login', async (req, res) => {
         catch {
             return res.status(401).json({ message: 'Usuário ou senha inválidos' }); 
         }
-        console.log(valid);
         
         res.cookie('token', token, {
             httpOnly: true,
@@ -79,39 +80,39 @@ app.post('/login', async (req, res) => {
 
     const active_sessions = await client.query('SELECT * FROM sessions WHERE id_usuario = $1;', [user_list.rows[0].id_usuario])
 
-    if (active_sessions.rows[0].active) {
-        res.status(403).json({
-            status: 'logged',
-            message: 'Usuário já logado!',
-            token: jwt.sign({
-                id: user_list.user_list,
-                email: user_list.email
-            },
-            secretKey,
-            {
-                expiresIn: '1h'
-            })
-        });
+
+    if (active_sessions.rows.length) {
+        if (active_sessions.rows[0].active) {
+            return res.status(403).json({
+                status: 'logged',
+                message: 'Usuário já logado!',
+                token: jwt.sign({
+                    id: user_list.user_list,
+                    email: user_list.email
+                },
+                secretKey,
+                {
+                    expiresIn: '1h'
+                })
+            });
+        }
     }
-    res.status(200).send()
 
-    return
-
-
-    if (user_list) {
-        const token = jwt.sign({ id: user_list.user_list, email: user_list.email,  }, secretKey, { expiresIn: '1h' });
-        await client.query('INSERT INTO sessions(id_usuario, active) VALUES($1, true);', [user_list.rows[0].id_usuario])
-
+    if (user_list && user_list.rows.length > 0) {
+        const token = jwt.sign({ id: user_list.rows[0].id_usuario, email: user_list.rows[0].email }, secretKey, { expiresIn: '1h' });
+    
+        await client.query('INSERT INTO sessions(id_usuario, active) VALUES($1, true);', [user_list.rows[0].id_usuario]);
+    
         res.cookie('token', token, {
             httpOnly: true,
             secure: false,
             sameSite: 'Strict'
         });
-
-        res.json({ message: 'Login realizado com sucesso!' });
+    
+        return res.json({ message: 'Login realizado com sucesso!' });
     } else {
-        res.status(401).json({ message: 'Usuário ou senha inválidos' });
-    }
+        return res.status(401).json({ message: 'Usuário ou senha inválidos' });
+    }    
 });
 
 app.get('/home', authenticateToken, (req, res) => {

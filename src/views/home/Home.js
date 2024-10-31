@@ -31,7 +31,7 @@ const HomePage = () => {
             }
         };
 
-        // checkAuth();
+        checkAuth();
     }, [navigate]);
 
     const homeStyle = {

@@ -22,14 +22,15 @@ const LoginPage = () => {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ email, password }),
+                credentials: 'include',
             });
 
             if (response.ok) {
                 navigate('/');
             } else {
                 let responseJson = await response.json();
-                if (responseJson.status == 'logged') {
+                if (responseJson.status === 'logged') {
                     const showSwal = () => {
                         withReactContent(Swal).fire({
                             title: 'Usuário já logado, deseja substituir a sessão?',
@@ -40,13 +41,15 @@ const LoginPage = () => {
                             cancelButtonText: 'Cancelar',
                             preConfirm: async () => {
                                 try {
-                                    let req = await fetch('http://localhost:5000/login', {
+                                    const res = await fetch('http://localhost:5000/login', {
                                         method: 'POST',
                                         headers: {
                                             'Content-Type': 'application/json',
                                         },
-                                        body: JSON.stringify({ email, password, token: responseJson.token })
-                                    });
+                                        body: JSON.stringify({ email, password, token: responseJson.token }),
+                                        credentials: 'include'
+                                    });                                    
+                                    if (res.ok) navigate('/'); 
                                 } catch (error) {
                                     console.log('NOTOK');
                                 }
