@@ -9,3 +9,9 @@ CREATE TABLE IF NOT EXISTS sessions (
     active BOOLEAN NOT NULL,
     CONSTRAINT fk_id_usuario FOREIGN KEY(id_usuario) REFERENCES usuario(id_usuario)
 );
+
+INSERT INTO usuario(id_usuario, email, hash)
+	VALUES (1, 'admin@interfocus.com.br', '$2b$10$WsyAhYD6ggL4xAXhs60KYOmBTGdXjXROike2JMlkBg1/Zypdxi12W');
+
+-- Login: admin@interfocus.com.br
+-- Senha: admin
