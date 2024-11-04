@@ -5,10 +5,13 @@ const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const pg = require('pg');
 const security = require('./lib/security');
+const path = require('path');
 
 const app = express();
 const port = 5000;
 const secretKey = 'rootroot';
+
+const DEV_MODE = true
 
 const { Client } = pg;
 const client = new Client({
@@ -24,14 +27,18 @@ client.connect()
         console.log('Conectado ao banco de dados!');
     });
 
-app.use(cors({
-    origin: 'http://localhost:3000',
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-}));
 app.use(express.json());
 app.use(cookieParser());
+
+if (!DEV_MODE) app.use(express.static(path.join(__dirname, '..', 'build')));
+else {
+    app.use(cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+    }));
+}
 
 const authenticateToken = (req, res, next) => {
     const token = req.cookies.token;
@@ -121,9 +128,16 @@ app.get('/home', authenticateToken, (req, res) => {
 
 app.get('/logout', (req, res) => {
     res.clearCookie("token");
-    res.status(302).redirect('http://localhost:3000/login');
+    if (!DEV_MODE) return res.status(302).redirect('/login');
+    return res.status(302).redirect('http://localhost:5000/login');
 });
 
+
+if (!DEV_MODE) {
+    app.get('*', (req, res) => {
+        res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+    });
+}
 
 app.listen(port, () => {
     console.log(`API rodando em http://localhost:${port}`);
