@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import InputField from "../../assets/components/InputField";
-import { FcGoogle } from "react-icons/fc";
 import Checkbox from '../../assets/components/Checkbox';
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
@@ -81,17 +80,6 @@ const LoginPage = () => {
                 <p className="mb-6 text-left text-[#b1b1b1]">
                     Digite seu e-mail e senha para entrar!
                 </p>
-                <div className="mb-6 flex items-center justify-center gap-2 rounded-xl bg-lightPrimary bg-[#f4f7fe] hover:cursor-pointer py-3">
-                    <FcGoogle className="text-xl" />
-                    <h5 className="text-sm p-1 font-medium text-navy-700">
-                        Entrar com o Google
-                    </h5>
-                </div>
-                <div className="mb-1 flex items-center justify-between">
-                    <div className="h-px w-full bg-gray-200" />
-                    <p className="px-3 text-sm text-gray-600">ou</p>
-                    <div className="h-px w-full bg-gray-200" />
-                </div>
                 {error && (
                     <div
                         className="mt-1 p-2 text-sm text-red-500 bg-red-100 rounded-md"
