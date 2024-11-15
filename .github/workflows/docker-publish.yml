@@ -25,6 +25,6 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/fpa-04:latest
           build-args: |
-            DB_USER=${{ secrets.DB_USER }}
-            DB_PASSWORD=${{ secrets.DB_PASSWORD }}
+            DB_USER=postgres
+            DB_PASSWORD=root
             DB_HOST=db
