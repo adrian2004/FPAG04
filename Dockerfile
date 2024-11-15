@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/user/app
 
-COPY . /home/user/app/
-
+COPY lib/ /home/user/app/lib/
+COPY index.js /home/user/app/index.js
 COPY package.json /home/user/app/
 
 RUN npm install
