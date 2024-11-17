@@ -12,14 +12,14 @@ services:
       - app_network
     env_file:
       - .env
+    volumes:
+      - ./:/home/user/app
 
   db:
     image: postgres:latest
     container_name: postgres_db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: postgres
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
