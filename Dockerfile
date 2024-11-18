@@ -12,12 +12,12 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/user/app
 
-# COPY lib/ /home/user/app/lib/
-# COPY build/ /home/user/app/build
-# COPY index.js /home/user/app/index.js
+COPY build/ /home/user/app/build
+COPY lib/ /home/user/app/lib/
+COPY src/ /home/user/app/src/
 COPY package.json /home/user/app/
 
 RUN npm install
 
-# CMD [ "node", "index.js" ]
-CMD [ "/bin/bash" ]
+CMD [ "node", "src/server.js" ]
+# CMD [ "/bin/bash" ]
