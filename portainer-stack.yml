@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+  pg-admin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - default
+      - ingress-network
+    depends_on:
+      - db
+    deploy:
+      labels:
+        caddy: pg-interfocus.labs.unimar.br
+        caddy.reverse_proxy: "{{upstreams 80}}"
+      mode: replicated
+      restart_policy:
+        condition: any
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 250M
+        reservations:
+          cpus: '0.25'
+          memory: 50M
+  web:
+    image: kauefranca/fpa-04:latest
+    environment:
+      DB_USER: ${DB_USER}
+      DB_HOST: ${DB_HOST}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      DEV_MODE: ${DEV_MODE}
+    networks:
+      - default
+      - ingress-network
+    depends_on:
+      - db
+    deploy:
+      labels:
+        caddy: interfocus.labs.unimar.br
+        caddy.reverse_proxy: "{{upstreams 5000}}"
+      mode: replicated
+      restart_policy:
+        condition: any
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 250M
+        reservations:
+          cpus: '0.25'
+          memory: 50M
+volumes:
+  db-data:
+
+networks:
+  default:
+  ingress-network:
+    external: True

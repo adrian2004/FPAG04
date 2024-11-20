@@ -1,0 +1,47 @@
+services:
+  app:
+    build: .
+    tty: true
+    container_name: fpa04
+    ports:
+      - "5000:5000"
+    stop_signal: SIGKILL
+    depends_on:
+      - db
+    networks:
+      - app_network
+    env_file:
+      - .env
+    volumes:
+      - ./:/home/user/app
+
+  db:
+    image: postgres:latest
+    container_name: postgres_db
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+    networks:
+      - app_network
+    env_file:
+      - .env
+
+volumes:
+  postgres_data:
+
+networks:
+  app_network:
+    driver: bridge
