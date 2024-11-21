@@ -2,11 +2,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
-// const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 app.use(cors({
-    origin: 'http://localhost:3000',  // Permitir apenas o frontend React
+    origin:  [
+        'https://interfocus.labs.unimar.br/',
+        process.env.ENVIRONMENT == 'dev' ? 'http://localhost:3000' : undefined,
+    ],
     credentials: true,
 }));
 
@@ -17,9 +19,6 @@ app.use(express.static(path.join(__dirname, '..', 'build')));
 
 // Registra rotas
 app.use(require('./routes'));
-
-// Middleware para tratar erros
-// app.use(errorHandler);
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));

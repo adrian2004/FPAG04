@@ -24,19 +24,19 @@ router.post('/login', async (req, res) => {
                     last_active = now();
             `, [userId, token]);
 
-            return res.json({ message: 'Sessão validada e atualizada com sucesso!' });
+            return res.json({ status: 'success', message: 'Sessão validada e atualizada com sucesso!' });
         }
 
         const userResult = await db.query('SELECT * FROM usuario WHERE email = $1;', [email]);
 
         if (userResult.rowCount === 0) {
-            return res.status(401).json({ message: 'Usuário ou senha inválidos' });
+            return res.status(401).json({ status: 'unauthorized', message: 'Usuário ou senha inválidos' });
         }
 
         const user = userResult.rows[0];
 
         if (!await security.checkHash(password, user.hash)) {
-            return res.status(401).json({ message: 'Usuário ou senha inválidos' });
+            return res.status(401).json({ status: 'unauthorized', message: 'Usuário ou senha inválidos' });
         }
 
         const sessionResult = await db.query('SELECT * FROM sessions WHERE id_usuario = $1;', [user.id_usuario]);
@@ -45,6 +45,7 @@ router.post('/login', async (req, res) => {
         if (activeSession) {
             const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '1h' });
             return res.status(403).json({ 
+                status: 'logged',
                 message: 'Usuário já está logado!', 
                 token: newToken 
             });
@@ -68,10 +69,10 @@ router.post('/login', async (req, res) => {
             sameSite: 'Strict',
         });
 
-        return res.json({ message: 'Login realizado com sucesso!', token: newToken });
+        return res.json({ status: 'success', message: 'Login realizado com sucesso!', token: newToken });
     } catch (error) {
         console.error('Erro durante o login:', error);
-        return res.status(500).json({ message: 'Erro no servidor' });
+        return res.status(500).json({ status: 'server_error', message: 'Erro no servidor' });
     }
 });
 
