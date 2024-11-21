@@ -49,7 +49,7 @@ services:
       DB_HOST: ${DB_HOST}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      DEV_MODE: ${DEV_MODE}
+      ENVIRONMENT: ${ENVIRONMENT}
     networks:
       - default
       - ingress-network

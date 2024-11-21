@@ -3,7 +3,7 @@ const router = express.Router();
 const authenticateToken = require('../middleware/authenticateToken');
 
 router.get('/home', authenticateToken, (req, res) => {
-    res.status(200).send();
+    res.sendStatus(200);
 });
 
 module.exports = router;

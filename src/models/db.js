@@ -8,15 +8,11 @@ const pool = new Pool({
     database: process.env.DB_NAME || 'postgres',
 });
 
-pool.on('connect', () => {
-    console.log('Conectado ao banco de dados!');
-});
-
 pool.on('error', (err) => {
     console.error('Erro no pool de conexões:', err);
 });
 
 module.exports = {
-    query: (text, params) => pool.query(text, params), // Consulta parametrizada
-    pool, // Exporta o pool para casos avançados
+    query: (text, params) => pool.query(text, params),
+    pool,
 };
