@@ -2,12 +2,13 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
+const swaggerSetup = require('./swagger');
 
 const app = express();
 app.use(cors({
-    origin:  [
+    origin: [
         'https://interfocus.labs.unimar.br/',
-        process.env.ENVIRONMENT == 'dev' ? 'http://localhost:3000' : undefined,
+        process.env.ENVIRONMENT === 'dev' ? 'http://localhost:3000' : undefined,
     ],
     credentials: true,
 }));
@@ -16,6 +17,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '..', 'build')));
+
+// Configurações Swagger
+swaggerSetup(app);
 
 // Registra rotas
 app.use(require('./routes'));
