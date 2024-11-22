@@ -6,6 +6,93 @@ const security = require('../../../lib/security');
 
 const secretKey = process.env.JWT_SECRET;
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Realiza o login do usuário
+ *     description: Autentica o usuário com e-mail e senha ou valida um token de sessão existente.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: E-mail do usuário (necessário para login inicial).
+ *                 example: "usuario@example.com"
+ *               password:
+ *                 type: string
+ *                 description: Senha do usuário (necessário para login inicial).
+ *                 example: "senha123"
+ *               token:
+ *                 type: string
+ *                 description: Token JWT existente para validar a sessão.
+ *                 example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *     responses:
+ *       200:
+ *         description: Login ou validação de sessão realizada com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *                 message:
+ *                   type: string
+ *                   example: "Login realizado com sucesso!"
+ *                 token:
+ *                   type: string
+ *                   description: Token JWT gerado (quando aplicável).
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *       401:
+ *         description: Credenciais inválidas ou token inválido.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "unauthorized"
+ *                 message:
+ *                   type: string
+ *                   example: "Usuário ou senha inválidos"
+ *       403:
+ *         description: Usuário já está logado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "logged"
+ *                 message:
+ *                   type: string
+ *                   example: "Usuário já está logado!"
+ *                 token:
+ *                   type: string
+ *                   description: Novo token JWT gerado para o usuário.
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *       500:
+ *         description: Erro interno do servidor.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "server_error"
+ *                 message:
+ *                   type: string
+ *                   example: "Erro no servidor"
+ */
 router.post('/login', async (req, res) => {
     const { email, password, token } = req.body;
 
@@ -43,7 +130,8 @@ router.post('/login', async (req, res) => {
         const activeSession = sessionResult.rows.find(session => session.active);
 
         if (activeSession) {
-            const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '1h' });
+            const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '24h' });
+            
             return res.status(403).json({ 
                 status: 'logged',
                 message: 'Usuário já está logado!', 
@@ -51,7 +139,8 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '1h' });
+        const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '24h' });
+        console.log(newToken);
 
         await db.query(`
             INSERT INTO sessions (id_usuario, active, jwt, last_active)
@@ -62,12 +151,6 @@ router.post('/login', async (req, res) => {
                 jwt = $2,
                 last_active = now();
         `, [user.id_usuario, newToken]);
-
-        res.cookie('token', newToken, {
-            httpOnly: true,
-            secure: false,
-            sameSite: 'Strict',
-        });
 
         return res.json({ status: 'success', message: 'Login realizado com sucesso!', token: newToken });
     } catch (error) {
