@@ -1,1 +1,1 @@
-sudo docker exec -it fpa04 /bin/bash
+docker exec -it fpa04 /bin/bash
