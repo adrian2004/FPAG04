@@ -1,5 +1,9 @@
 const bcrypt = require('bcrypt');
 
+exports.checkHash = async function (inputString, hash) {
+    return await bcrypt.compare(inputString, hash);
+};
+
 exports.generateHash = async function (inputString) {
     try {
         const salt = await bcrypt.genSalt(10);
@@ -7,8 +11,4 @@ exports.generateHash = async function (inputString) {
     } catch (err) {
         return null;
     };
-};
-
-exports.checkHash = async function (inputString, hash) {
-    return await bcrypt.compare(inputString, hash);
 };
