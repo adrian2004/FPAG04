@@ -11,7 +11,8 @@ const secretKey = process.env.JWT_SECRET;
  * /api/auth/login:
  *   post:
  *     summary: Realiza o login do usuário
- *     description: Autentica o usuário com e-mail e senha ou valida um token de sessão existente.
+ *     description: Autentica o usuário com e-mail e senha ou valida um token de sessão existente. Suporta rastreamento de origem do login.
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -30,7 +31,11 @@ const secretKey = process.env.JWT_SECRET;
  *               token:
  *                 type: string
  *                 description: Token JWT existente para validar a sessão.
- *                 example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *                 example: ""
+ *               loggedAt:
+ *                 type: string
+ *                 description: Identifica a origem do login (main, unknow e etc.).
+ *                 example: "main"
  *     responses:
  *       200:
  *         description: Login ou validação de sessão realizada com sucesso.
@@ -94,7 +99,14 @@ const secretKey = process.env.JWT_SECRET;
  *                   example: "Erro no servidor"
  */
 router.post('/login', async (req, res) => {
-    const { email, password, token } = req.body;
+    const { 
+        email,
+        password,
+        token,
+    } = req.body;
+
+    const loggedAt = ['main', 'project1', 'project2', 'project3'].includes(req.body.loggedAt) ?
+                     req.body.loggedAt : 'unknow'
 
     try {
         if (token) {
@@ -102,14 +114,15 @@ router.post('/login', async (req, res) => {
             const userId = decoded.id;
 
             await db.query(`
-                INSERT INTO sessions (id_usuario, active, jwt, last_active)
-                VALUES ($1, true, $2, now())
+                INSERT INTO sessions (id_usuario, active, jwt, last_active, logged_at)
+                VALUES ($1, true, $2, now(), $3)
                 ON CONFLICT (id_usuario)
                 DO UPDATE SET 
                     active = true,
                     jwt = $2,
-                    last_active = now();
-            `, [userId, token]);
+                    last_active = now(),
+                    logged_at = $3;
+            `, [userId, token, loggedAt]);
 
             return res.json({ status: 'success', message: 'Sessão validada e atualizada com sucesso!' });
         }
@@ -140,17 +153,17 @@ router.post('/login', async (req, res) => {
         }
 
         const newToken = jwt.sign({ id: user.id_usuario, email: user.email }, secretKey, { expiresIn: '24h' });
-        console.log(newToken);
 
         await db.query(`
-            INSERT INTO sessions (id_usuario, active, jwt, last_active)
-            VALUES ($1, true, $2, now())
+            INSERT INTO sessions (id_usuario, active, jwt, last_active, logged_at)
+            VALUES ($1, true, $2, now(), $3)
             ON CONFLICT (id_usuario)
             DO UPDATE SET 
                 active = true,
                 jwt = $2,
-                last_active = now();
-        `, [user.id_usuario, newToken]);
+                last_active = now(),
+                logged_at = $3;
+        `, [user.id_usuario, newToken, loggedAt]);
 
         return res.json({ status: 'success', message: 'Login realizado com sucesso!', token: newToken });
     } catch (error) {

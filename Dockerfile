@@ -10,12 +10,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/user/app
-
 COPY build/ /home/user/app/build
-COPY lib/ /home/user/app/lib/
 COPY src/ /home/user/app/src/
 COPY package.json /home/user/app/
+
+WORKDIR /home/user/app/
 
 RUN npm install
 

@@ -3,17 +3,33 @@ const router = express.Router();
 const db = require('../../../models/db');
 const authenticateToken = require('../../../middleware/authenticateToken');
 
-/**0
+/**
  * @swagger
  * /api/auth/logout:
  *   get:
  *     summary: Realiza o logout do usuário
  *     description: Invalida a sessão do usuário, atualizando o banco de dados e removendo o cookie do token JWT.
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Logout realizado com sucesso.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: "success"
+ *       401:
+ *         description: Token inválido ou ausente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Token inválido ou não fornecido."
  *       500:
  *         description: Erro interno ao realizar o logout.
  *         content:

@@ -9,10 +9,24 @@ const swaggerOptions = {
             version: '1.0.0',
             description: 'Documentação da API de autenticação',
         },
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT',
+                },
+            },
+        },
+        security: [
+            {
+                BearerAuth: [],
+            },
+        ],
         servers: [
             {
-                url: process.env.ENVIRONMENT === 'dev' 
-                    ? 'http://localhost:5000' 
+                url: process.env.ENVIRONMENT === 'dev'
+                    ? 'http://localhost:5000'
                     : 'https://interfocus.labs.unimar.br/',
             },
         ],
