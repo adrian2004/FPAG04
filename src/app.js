@@ -5,12 +5,17 @@ const path = require('path');
 const swaggerSetup = require('./swagger');
 
 const app = express();
+
+let allowedOrigins = [ 'https://interfocus.labs.unimar.br/' ]
+
+if (process.env.ENVIRONMENT === 'dev' || process.env.ENVIRONMENT === 'hml') {
+    allowedOrigins = '*'
+}
+
 app.use(cors({
-    origin: [
-        'https://interfocus.labs.unimar.br/',
-        process.env.ENVIRONMENT === 'dev' ? 'http://localhost:3000' : undefined,
-    ],
+    origin: allowedOrigins,
     credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Configurações básicas

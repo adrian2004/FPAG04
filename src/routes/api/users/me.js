@@ -9,8 +9,6 @@ const db = require('../../../models/db');
  *   get:
  *     summary: Obtém os dados do usuário autenticado
  *     description: Retorna o ID e o e-mail do usuário autenticado, baseado no token JWT.
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Dados do usuário retornados com sucesso.
