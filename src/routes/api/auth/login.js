@@ -12,8 +12,7 @@ const secretKey = process.env.JWT_SECRET;
  *   post:
  *     summary: Realiza o login do usuário
  *     description: Autentica o usuário com e-mail e senha ou valida um token de sessão existente. Suporta rastreamento de origem do login.
- *     security:
- *       - bearerAuth: []
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
